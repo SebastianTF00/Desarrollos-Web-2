@@ -1,0 +1,66 @@
+CREATE DATABASE IF NOT EXISTS techstore_db;
+USE techstore_db;
+
+-- 1. Tabla de Categorías
+CREATE TABLE categorias (
+    id_categoria INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(50) NOT NULL UNIQUE,
+    descripcion VARCHAR(255)
+);
+
+-- 2. Tabla de Usuarios
+CREATE TABLE usuarios (
+    id_usuario INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    correo VARCHAR(100) NOT NULL UNIQUE,
+    contrasenia VARCHAR(255) NOT NULL, -- Aquí irá encriptada más adelante
+    rol VARCHAR(20) DEFAULT 'CLIENTE', -- CLIENTE o ADMIN
+    fecha_registro TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 3. Tabla de Productos
+CREATE TABLE productos (
+    id_producto INT AUTO_INCREMENT PRIMARY KEY,
+    id_categoria INT,
+    nombre VARCHAR(150) NOT NULL,
+    descripcion TEXT, -- Para poner las specs técnicas detalladas
+    precio DECIMAL(10,2) NOT NULL,
+    stock INT NOT NULL DEFAULT 0,
+    imagen_url VARCHAR(255), -- Ruta o link de la foto del componente
+    fecha_creacion TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_categoria) REFERENCES categorias(id_categoria) ON DELETE SET NULL
+);
+
+-- 4. Tabla de Pedidos (Cabecera)
+CREATE TABLE pedidos (
+    id_pedido INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT,
+    fecha_pedido TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    total DECIMAL(10,2) NOT NULL,
+    estado VARCHAR(30) DEFAULT 'PENDIENTE', -- PENDIENTE, PAGADO, ENVIADO, CANCELADO
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuario) ON DELETE SET NULL
+);
+
+-- 5. Tabla de Detalles del Pedido (Cuerpo)
+CREATE TABLE detalles_pedido (
+    id_detalle INT AUTO_INCREMENT PRIMARY KEY,
+    id_pedido INT,
+    id_producto INT,
+    cantidad INT NOT NULL,
+    precio_unitario DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (id_pedido) REFERENCES pedidos(id_pedido) ON DELETE CASCADE,
+    FOREIGN KEY (id_producto) REFERENCES productos(id_producto)
+);
+
+
+-- Insertar Categorías de tecnología
+INSERT INTO categorias (nombre, descripcion) VALUES 
+('Procesadores', 'CPUs de última generación para PCs de escritorio'),
+('Tarjetas de Video', 'GPUs para gaming y diseño profesional'),
+('Perifericos', 'Mouses, teclados, audífonos y accesorios');
+
+-- Insertar Productos de prueba
+INSERT INTO productos (id_categoria, nombre, descripcion, precio, stock, imagen_url) VALUES 
+(1, 'AMD Ryzen 7 5700X', '8 núcleos, 16 hilos, 3.4GHz base, socket AM4', 195.00, 15, 'https://link-de-la-imagen.com/ryzen7.jpg'),
+(2, 'NVIDIA RTX 4060 Ti 8GB', 'Arquitectura Ada Lovelace, DLSS 3, Ray Tracing', 399.99, 8, 'https://link-de-la-imagen.com/rtx4060.jpg'),
+(3, 'Mouse Gamer Inalámbrico Pro', 'Sensor de alta precisión 16000 DPI, tasa 1000Hz, batería recargable', 75.50, 30, 'https://link-de-la-imagen.com/mouse.jpg');
