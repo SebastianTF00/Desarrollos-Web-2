@@ -8,3 +8,5 @@ import org.springframework.stereotype.Repository;
 public interface CategoriaRepository extends JpaRepository<Categoria, Integer> {
     // Aquí ya tenemos listos métodos como save(), findAll(), findById(), deleteById()
 }
+
+//test
