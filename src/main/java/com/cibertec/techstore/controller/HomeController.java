@@ -1,18 +1,14 @@
 package com.cibertec.techstore.controller;
 
-import com.cibertec.techstore.repository.CategoriaRepository;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-
 import com.cibertec.techstore.model.Producto;
+import com.cibertec.techstore.model.Usuario; // ¡Importación agregada!
+import com.cibertec.techstore.repository.CategoriaRepository;
+import com.cibertec.techstore.repository.UsuarioRepository;
+import com.cibertec.techstore.service.IProductoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-
-import com.cibertec.techstore.service.IProductoService;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -24,18 +20,25 @@ public class HomeController {
     @Autowired
     private IProductoService productoService;
 
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private CategoriaRepository categoriaRepository;
+
+    // --- CATÁLOGO PRINCIPAL (TIENDA) ---
     @GetMapping("/")
     public String index(Model model) {
-        // SIMULAMOS LA LISTA DE PRODUCTOS BASADA EN EL SQL
+        // Simulamos la lista de productos basada en el SQL para la vista de inicio
         List<Producto> destacados = new ArrayList<>();
-        
+
         Producto p1 = new Producto();
         p1.setIdProducto(1);
         p1.setNombre("AMD Ryzen 7 5700X");
         p1.setDescripcion("8 núcleos, 16 hilos, 3.4GHz base, socket AM4");
-        p1.setPrecio(new BigDecimal("195.00")); // Usamos BigDecimal según tu modelo
+        p1.setPrecio(new BigDecimal("195.00"));
         p1.setStock(15);
-        p1.setImagenUrl("https://img.freepik.com/vector-gratis/chip-procesador-tecnologia-informatica-vector-microchip-cpu_53876-172551.jpg"); // Imagen referencial
+        p1.setImagenUrl("https://img.freepik.com/vector-gratis/chip-procesador-tecnologia-informatica-vector-microchip-cpu_53876-172551.jpg");
 
         Producto p2 = new Producto();
         p2.setIdProducto(2);
@@ -57,17 +60,45 @@ public class HomeController {
         destacados.add(p2);
         destacados.add(p3);
 
-        // Enviamos la lista a la vista
         model.addAttribute("productos", destacados);
         model.addAttribute("tituloPagina", "TechStore - Inicio");
-        
-        return "inicio"; // Renderiza inicio.html
+
+        return "inicio";
     }
+
+    // --- CONTROL DE LOGIN ÚNICO ---
+    @GetMapping("/login")
+    public String mostrarLogin() {
+        return "login";
+    }
+
+    @PostMapping("/login")
+    public String procesarLogin(@RequestParam("correo") String correo,
+                                @RequestParam("password") String password,
+                                Model model) {
+
+        // Buscamos el usuario en la base de datos por su correo
+        Usuario usuario = usuarioRepository.findByCorreo(correo);
+
+        // Validación real de credenciales
+        if (usuario != null && usuario.getContrasenia().equals(password)) {
+            // Si el usuario es ADMIN, va al inventario de frente
+            if ("ADMIN".equals(usuario.getRol())) {
+                return "redirect:/inventario";
+            }
+            // Si es un cliente común, lo mandamos al catálogo de la tienda
+            return "redirect:/";
+        }
+
+        // Si falla, volvemos a pintar el login con el mensaje de error personalizado
+        model.addAttribute("error", "Credenciales incorrectas. Acceso denegado.");
+        return "login";
+    }
+
+    // --- GESTIÓN DE INVENTARIO (ADMIN PANEL) ---
     @GetMapping("/inventario")
     public String gestionInventario(Model model) {
-
         List<Producto> listaProductos = productoService.listarTodos();
-
         model.addAttribute("productos", listaProductos);
 
         long totalProductos = listaProductos.size();
@@ -76,86 +107,44 @@ public class HomeController {
         model.addAttribute("totalProductos", totalProductos);
         model.addAttribute("bajoStock", bajoStock);
 
-        return "inventario"; // Renderiza inventario.html dentro de templates
+        return "inventario";
     }
 
-    // 1. Mostrar la página de Login
-    @GetMapping("/login")
-    public String mostrarLogin() {
-        return "login"; // Renderiza templates/login.html
-    }
-
-    // 2. Procesar el formulario de Login
-    @PostMapping("/login")
-    public String procesarLogin(@RequestParam("correo") String correo, 
-                                @RequestParam("contrasenia") String contrasenia, 
-                                Model model) {
-        
-        // Simulación de validación para este avance (luego se conectará a la BD real)
-        if ("admin@techstore.com".equals(correo) && "admin123".equals(contrasenia)) {
-            // Si es correcto, lo enviamos de frente a la vista de inventario
-            return "redirect:/inventario";
-        }
-        
-        // Si falla, recargamos el login enviando un mensaje de error
-        model.addAttribute("error", "Credenciales incorrectas. Acceso denegado.");
-        return "login";
-    }
-
-    // Mostrar la vista del carrito de compras
     @GetMapping("/carrito")
     public String mostrarCarrito() {
-        return "carrito"; // Renderiza templates/carrito.html
+        return "carrito";
     }
 
-
-
-    @Autowired
-    private CategoriaRepository categoriaRepository;
-
-    // --- NUEVAS RUTAS PARA EL CRUD DE INVENTARIO ---
-
-    // 1. Mostrar el formulario para un Nuevo Producto
+    // --- CRUD DE PRODUCTOS ---
     @GetMapping("/producto/nuevo")
     public String mostrarFormularioNuevo(Model model) {
-        // Enviamos un objeto Producto vacío para que el formulario lo llene
         model.addAttribute("producto", new Producto());
-        // Enviamos la lista de categorías para el <select> del formulario
         model.addAttribute("categorias", categoriaRepository.findAll());
-        return "nuevo-producto"; // Renderiza templates/nuevo-producto.html
+        return "nuevo-producto";
     }
 
-    // 2. Recibir los datos del formulario y guardar en la BD
     @PostMapping("/producto/guardar")
     public String guardarProducto(@ModelAttribute Producto producto) {
-        // El servicio guarda el producto en la base de datos (SQL)
         productoService.guardar(producto);
-        // Redirigimos de vuelta a la tabla del inventario para ver el nuevo producto
         return "redirect:/inventario";
     }
 
-    // 3. Mostrar el formulario para Editar Producto
     @GetMapping("/producto/editar/{id}")
     public String mostrarFormularioEditar(@PathVariable("id") Integer id, Model model) {
-        // Buscamos el producto en la BD por su ID
         Producto producto = productoService.obtenerPorId(id);
-        
+
         if (producto == null) {
-            return "redirect:/inventario"; // Si alguien pone un ID falso, lo regresamos
+            return "redirect:/inventario";
         }
-        
-        // Enviamos el producto encontrado y las categorías al formulario
+
         model.addAttribute("producto", producto);
         model.addAttribute("categorias", categoriaRepository.findAll());
-        
-        return "editar-producto"; // Renderiza templates/editar-producto.html
+        return "editar-producto";
     }
 
-    // 4. Eliminar Producto
     @GetMapping("/producto/eliminar/{id}")
     public String eliminarProducto(@PathVariable("id") Integer id) {
         productoService.eliminar(id);
-        // Recargamos la tabla
         return "redirect:/inventario";
     }
 }
