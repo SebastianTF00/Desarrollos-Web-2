@@ -1,9 +1,11 @@
 package com.cibertec.techstore.controller;
 
 import com.cibertec.techstore.model.Producto;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import com.cibertec.techstore.service.IProductoService;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -11,6 +13,9 @@ import java.util.List;
 
 @Controller
 public class HomeController {
+
+    @Autowired
+    private IProductoService productoService;
 
     @GetMapping("/")
     public String index(Model model) {
@@ -50,5 +55,20 @@ public class HomeController {
         model.addAttribute("tituloPagina", "TechStore - Inicio");
         
         return "inicio"; // Renderiza inicio.html
+    }
+    @GetMapping("/inventario")
+    public String gestionInventario(Model model) {
+
+        List<Producto> listaProductos = productoService.listarTodos();
+
+        model.addAttribute("productos", listaProductos);
+
+        long totalProductos = listaProductos.size();
+        long bajoStock = listaProductos.stream().filter(p -> p.getStock() < 5).count();
+
+        model.addAttribute("totalProductos", totalProductos);
+        model.addAttribute("bajoStock", bajoStock);
+
+        return "inventario"; // Renderiza inventario.html dentro de templates
     }
 }
