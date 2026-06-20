@@ -16,29 +16,24 @@
                 <h1>Admin Panel</h1>
                 <p>Gestión de Tienda</p>
             </div>
-            <ul class="menu-list">
-                <li class="menu-item active">
-                    <a href="/inventario"><span class="material-symbols-outlined">inventory_2</span> Productos</a>
-                </li>
-                <li class="menu-item">
-                    <a href="#"><span class="material-symbols-outlined">category</span> Categorías</a>
-                </li>
-                <li class="menu-item">
-                    <a href="#"><span class="material-symbols-outlined">group</span> Usuarios</a>
-                </li>
-                <li class="menu-item">
-                    <a href="#"><span class="material-symbols-outlined">shopping_bag</span> Pedidos</a>
-                </li>
-                <li class="menu-item">
-                    <a href="/"><span class="material-symbols-outlined">store</span> Ver Tienda</a>
-                </li>
-            </ul>
+        <ul class="menu-list mt-4">
+            <li class="menu-item"><a href="/inventario"><span class="material-symbols-outlined">inventory_2</span> Productos</a></li>
+            <li class="menu-item"><a href="/categorias"><span class="material-symbols-outlined">category</span> Categorías</a></li>
+            <li class="menu-item"><a href="/usuarios"><span class="material-symbols-outlined">group</span> Usuarios</a></li>
+            <li class="menu-item"><a href="/pedidos"><span class="material-symbols-outlined">shopping_bag</span> Pedidos</a></li>
+            
+            <li class="menu-item" style="margin-top: 2rem; border-top: 1px solid #1e293b; padding-top: 1rem;">
+                <a href="/" style="color: #a2d2ff; font-weight: bold;">
+                    <span class="material-symbols-outlined">storefront</span> Ver Tienda
+                </a>
+            </li>
+        </ul>
         </div>
 
         <div style="display:flex; align-items:center; gap:10px;">
             <span class="material-symbols-outlined" style="font-size:2.5rem; color:#a2d2ff;">account_circle</span>
             <div>
-                <h4 style="font-size:0.9rem;">Cristian</h4>
+                <h4 style="font-size:0.9rem;">Fabrizio</h4>
                 <p style="font-size:0.75rem; color:#64748b;">Administrador</p>
             </div>
         </div>
@@ -50,7 +45,7 @@
                 <span class="material-symbols-outlined" style="color:#64748b; font-size:1.2rem;">search</span>
                 <input type="text" placeholder="Buscar productos... (Ctrl+K)" style="background:none; border:none; color:#fff; outline:none; width:100%; font-size:0.85rem;">
             </div>
-            <a href="/inventario/nuevo" class="btn-new">
+            <a href="/producto/nuevo" class="btn-new">
                 <span class="material-symbols-outlined">add</span> Nuevo Producto
             </a>
         </div>
@@ -115,10 +110,16 @@
                                 </span>
                     </td>
                     <td>
-                        <div class="action-btns">
+                    <div class="action-btns">
+                        <a th:href="@{/producto/editar/{id}(id=${prod.idProducto})}" style="color: inherit; text-decoration: none;" title="Editar">
                             <span class="material-symbols-outlined">edit</span>
+                        </a>
+                        
+                        <a th:href="@{/producto/eliminar/{id}(id=${prod.idProducto})}" style="color: inherit; text-decoration: none;" title="Eliminar"
+                        onclick="return confirm('¿Estás seguro de que deseas eliminar este producto del inventario? Esta acción no se puede deshacer.');">
                             <span class="material-symbols-outlined" style="color:#ef4444;">delete</span>
-                        </div>
+                        </a>
+                    </div>
                     </td>
                 </tr>
                 </tbody>
