@@ -19,7 +19,7 @@ public class HomeController {
 
     @GetMapping("/")
     public String index(Model model) {
-        // Simulamos la lista de productos basada en tu script SQL
+        // SIMULAMOS LA LISTA DE PRODUCTOS BASADA EN EL SQL
         List<Producto> destacados = new ArrayList<>();
         
         Producto p1 = new Producto();
