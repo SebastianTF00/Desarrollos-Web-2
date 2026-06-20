@@ -13,7 +13,7 @@
     <div class="nav-left">
         <div class="logo">TechStore</div>
         <nav>
-            <a href="#" class="active">Tienda</a>
+            <a href="/" class="active">Tienda</a>
             <a href="#">Nosotros</a>
             <a href="#">Contactos</a>
         </nav>
@@ -23,6 +23,12 @@
             <span class="material-symbols-outlined search-icon">search</span>
             <input type="text" placeholder="Buscar componentes...">
         </div>
+
+        <a href="/inventario" style="color: var(--text-muted); text-decoration: none; font-size: 0.95rem; display: flex; align-items: center; gap: 5px; transition: color 0.2s;" onmouseover="this.style.color='#ffffff'" onmouseout="this.style.color='var(--text-muted)'">
+            <span class="material-symbols-outlined" style="font-size: 1.3rem;">admin_panel_settings</span>
+            Admin Panel
+        </a>
+
         <div class="cart-icon">
             <span class="material-symbols-outlined">shopping_cart</span>
             <span class="cart-count" id="cart-counter">0</span>

@@ -1,11 +1,15 @@
 package com.cibertec.techstore.controller;
 
+import com.cibertec.techstore.model.Categoria;
 import com.cibertec.techstore.model.Producto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
 import com.cibertec.techstore.service.IProductoService;
+import com.cibertec.techstore.service.ICategoriaService;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -16,6 +20,9 @@ public class HomeController {
 
     @Autowired
     private IProductoService productoService;
+
+    @Autowired
+    private ICategoriaService categoriaService;
 
     @GetMapping("/")
     public String index(Model model) {
@@ -56,19 +63,33 @@ public class HomeController {
         
         return "inicio"; // Renderiza inicio.html
     }
+    // 1. Mostrar la tabla del Inventario
     @GetMapping("/inventario")
     public String gestionInventario(Model model) {
-
         List<Producto> listaProductos = productoService.listarTodos();
-
         model.addAttribute("productos", listaProductos);
 
-        long totalProductos = listaProductos.size();
-        long bajoStock = listaProductos.stream().filter(p -> p.getStock() < 5).count();
-
-        model.addAttribute("totalProductos", totalProductos);
-        model.addAttribute("bajoStock", bajoStock);
-
-        return "inventario"; // Renderiza inventario.html dentro de templates
+        model.addAttribute("totalProductos", listaProductos.size());
+        model.addAttribute("bajoStock", listaProductos.stream().filter(p -> p.getStock() < 5).count());
+        return "inventario";
     }
+
+    // 2. Mostrar la página con el formulario para el Nuevo Producto
+    @GetMapping("/inventario/nuevo")
+    public String mostrarFormularioNuevo(Model model) {
+        Producto producto = new Producto();
+        List<Categoria> listaCategorias = categoriaService.listarTodos(); // Jalamos las categorías de la BD
+
+        model.addAttribute("producto", producto);
+        model.addAttribute("categorias", listaCategorias); // Enviamos las categorías al select del HTML
+        return "nuevo-producto"; // Buscará nuevo-producto.html dentro de templates
+    }
+
+    // 3. Procesar el formulario y guardar en la Base de Datos
+    @PostMapping("/inventario/guardar")
+    public String guardarProducto(@ModelAttribute("producto") Producto producto) {
+        productoService.guardar(producto); // Inserta el producto en MySQL Workbench
+        return "redirect:/inventario"; // Nos regresa automáticamente a la tabla actualizada
+    }
+
 }

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | Nuevo Producto</title>
+    <link rel="stylesheet" href="/css/estilos.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" />
+</head>
+<body>
+
+<div class="form-container">
+    <h2 style="font-size: 1.6rem; margin-bottom: 0.5rem;">Agregar Nuevo Componente</h2>
+    <p style="color: #94a3b8; font-size: 0.85rem; margin-bottom: 2rem;">Ingresa las especificaciones técnicas del nuevo artículo para el catálogo.</p>
+
+    <form th:action="@{/inventario/guardar}" th:object="${producto}" method="POST">
+
+        <div class="form-group">
+            <label for="nombre">Nombre del Producto</label>
+            <input type="text" id="nombre" th:field="*{nombre}" placeholder="Ej. ASUS ROG Strix RTX 4090" required />
+        </div>
+
+        <div class="form-group">
+            <label for="categoria">Categoría de Hardware</label>
+            <select id="categoria" th:field="*{categoria.idCategoria}" required>
+                <option value="" disabled selected>Selecciona una categoría...</option>
+                <option th:each="cat : ${categorias}"
+                        th:value="${cat.idCategoria}"
+                        th:text="${cat.nombre}">Procesadores</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="descripcion">Detalles Técnicos / Descripción</label>
+            <textarea id="descripcion" th:field="*{descripcion}" rows="3" placeholder="Especificaciones de núcleos, hilos, arquitectura, etc..." required></textarea>
+        </div>
+
+        <div class="row-grid">
+            <div class="form-group">
+                <label for="precio">Precio (S/.)</label>
+                <input type="number" id="precio" th:field="*{precio}" step="0.01" placeholder="0.00" required />
+            </div>
+            <div class="form-group">
+                <label for="stock">Stock Inicial</label>
+                <input type="number" id="stock" th:field="*{stock}" placeholder="Cantidad" required />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="imagenUrl">URL de la Imagen del Producto</label>
+            <input type="url" id="imagenUrl" th:field="*{imagenUrl}" placeholder="https://link-de-la-imagen.com/foto.jpg" />
+        </div>
+
+        <div class="form-actions">
+            <a href="/inventario" class="btn-cancel">Cancelar</a>
+            <button type="submit" class="btn-submit">Guardar Componente</button>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>
