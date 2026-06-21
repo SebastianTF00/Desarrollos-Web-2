@@ -87,7 +87,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:each="prod : ${productos}">
+                <tr th:each="prod : ${productos}" th:if="${prod != null}">
                     <td style="width: 80px;">
                         <div style="width:50px; height:50px; background:#1a2333; border-radius:6px; display:flex; align-items:center; justify-content:center;">
                             <img th:if="${prod.imagenUrl != null}" th:src="${prod.imagenUrl}" style="max-width:100%; max-height:100%; object-fit:contain; padding:4px;"/>
@@ -96,8 +96,8 @@
                     </td>
                     <td>
                         <div class="prod-info">
-                            <h4 th:text="${prod.nombre}">Nombre</h4>
-                            <span th:text="'ID: TS-' + ${prod.idProducto}">ID</span>
+                            <h4 th:text="${prod.nombre != null ? prod.nombre : 'Componente sin nombre'}">Nombre</h4>
+                            <span th:text="${prod.idProducto != null} ? 'ID: TS-' + ${prod.idProducto} : 'ID: Pendiente'">ID</span>
                         </div>
                     </td>
                     <td>
@@ -108,21 +108,21 @@
                         S/. 0.00
                     </td>
                     <td>
-                            <span th:class="${prod.stock != null && prod.stock < 5} ? 'badge-low' : 'badge-stock'"
-                              th:text="${prod.stock != null && prod.stock < 5} ? 'BAJO STOCK (' + ${prod.stock} + ')' : 'EN STOCK (' + (${prod.stock} != null ? ${prod.stock} : '0') + ')'">
-                            </span>
+        <span th:class="${prod.stock != null && prod.stock < 5} ? 'badge-low' : 'badge-stock'"
+              th:text="${prod.stock != null && prod.stock < 5} ? 'BAJO STOCK (' + ${prod.stock} + ')' : 'EN STOCK (' + (${prod.stock} != null ? ${prod.stock} : '0') + ')'">
+        </span>
                     </td>
                     <td>
-                    <div class="action-btns">
-                        <a th:href="@{/producto/editar/{id}(id=${prod.idProducto})}" style="color: inherit; text-decoration: none;" title="Editar">
-                            <span class="material-symbols-outlined">edit</span>
-                        </a>
-                        
-                        <a th:href="@{/producto/eliminar/{id}(id=${prod.idProducto})}" style="color: inherit; text-decoration: none;" title="Eliminar"
-                        onclick="return confirm('¿Estás seguro de que deseas eliminar este producto del inventario? Esta acción no se puede deshacer.');">
-                            <span class="material-symbols-outlined" style="color:#ef4444;">delete</span>
-                        </a>
-                    </div>
+                        <div class="action-btns" th:if="${prod.idProducto != null}">
+                            <a th:href="@{/producto/editar/{id}(id=${prod.idProducto})}" style="color: inherit; text-decoration: none;" title="Editar">
+                                <span class="material-symbols-outlined">edit</span>
+                            </a>
+
+                            <a th:href="@{/producto/eliminar/{id}(id=${prod.idProducto})}" style="color: inherit; text-decoration: none;" title="Eliminar"
+                               onclick="return confirm('¿Estás seguro de que deseas eliminar este producto?');">
+                                <span class="material-symbols-outlined" style="color:#ef4444;">delete</span>
+                            </a>
+                        </div>
                     </td>
                 </tr>
                 </tbody>
