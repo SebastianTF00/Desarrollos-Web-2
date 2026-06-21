@@ -103,11 +103,14 @@
                     <td>
                         <span class="badge-cat" th:text="${prod.categoria != null ? prod.categoria.nombre : 'General'}">Categoría</span>
                     </td>
-                    <td style="font-weight:600;" th:text="'S/. ' + ${#numbers.formatDecimal(prod.precio, 1, 2)}">S/. 0.00</td>
+                    <td style="font-weight:600;"
+                        th:text="${prod.precio != null} ? 'S/. ' + ${#numbers.formatDecimal(prod.precio, 1, 2)} : 'S/. 0.00'">
+                        S/. 0.00
+                    </td>
                     <td>
-                                <span th:class="${prod.stock < 5} ? 'badge-low' : 'badge-stock'"
-                                      th:text="${prod.stock < 5} ? 'BAJO STOCK (' + ${prod.stock} + ')' : 'EN STOCK (' + ${prod.stock} + ')'">
-                                </span>
+                            <span th:class="${prod.stock != null && prod.stock < 5} ? 'badge-low' : 'badge-stock'"
+                              th:text="${prod.stock != null && prod.stock < 5} ? 'BAJO STOCK (' + ${prod.stock} + ')' : 'EN STOCK (' + (${prod.stock} != null ? ${prod.stock} : '0') + ')'">
+                            </span>
                     </td>
                     <td>
                     <div class="action-btns">
