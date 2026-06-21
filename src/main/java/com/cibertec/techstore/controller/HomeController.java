@@ -95,15 +95,22 @@ public class HomeController {
         return "login";
     }
 
-    // --- GESTIÓN DE INVENTARIO (ADMIN PANEL) ---
     @GetMapping("/inventario")
     public String gestionInventario(Model model) {
         List<Producto> listaProductos = productoService.listarTodos();
+
+        // Si la lista de la BD viene completamente vacía, evitamos que rompa las tarjetas superiores
+        if (listaProductos == null) {
+            listaProductos = new ArrayList<>();
+        }
+
         model.addAttribute("productos", listaProductos);
 
+        // KPIs protegidos contra campos NULL en la base de datos de Railway
         long totalProductos = listaProductos.size();
+
         long bajoStock = listaProductos.stream()
-                .filter(p -> p.getStock() != null && p.getStock() < 5)
+                .filter(p -> p != null && p.getStock() != null && p.getStock() < 5)
                 .count();
 
         model.addAttribute("totalProductos", totalProductos);
