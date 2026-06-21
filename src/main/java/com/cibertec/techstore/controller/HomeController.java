@@ -102,7 +102,9 @@ public class HomeController {
         model.addAttribute("productos", listaProductos);
 
         long totalProductos = listaProductos.size();
-        long bajoStock = listaProductos.stream().filter(p -> p.getStock() < 5).count();
+        long bajoStock = listaProductos.stream()
+                .filter(p -> p.getStock() != null && p.getStock() < 5)
+                .count();
 
         model.addAttribute("totalProductos", totalProductos);
         model.addAttribute("bajoStock", bajoStock);
